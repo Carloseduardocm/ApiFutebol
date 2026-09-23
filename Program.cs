@@ -1,6 +1,8 @@
 using System.Text.Json;
-
+using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<ApiDbContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 var app = builder.Build();
 
 var clubes = new List<Clube>
@@ -58,6 +60,23 @@ app.MapDelete("/api/clubes/{id:int}", (int id) =>
 });
 
 app.Run();
+
+class ClubeEntity
+{
+    public int id { get; set; }
+    public string nome { get; set; }
+    public string estado { get; set; }
+    public bool serieA { get; set; }
+}
+
+class ApiDbContext : DbContext
+{
+    public ApiDbContext(DbContextOptions<ApiDbContext> options) : base(options)
+    {
+    }
+
+    public DbSet<ClubeEntity> Clubes => Set<ClubeEntity>();
+}
 
 record Clube(int id, string nome, string estado, bool serieA);
 record ClubeDTO(string nome, string estado, bool serieA);

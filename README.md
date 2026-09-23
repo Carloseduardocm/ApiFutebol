@@ -102,4 +102,4 @@ DELETE /api/clubes/3
 
 ## Video de demonstracao
 
-* [Clique aqui para assistir](https://drive.google.com/drive/folders/10chpoIbk9IV8ZFmPCmjQS6ukbGRwp23D?usp=drive_link)
+* [Clique aqui para assistir](https://drive.google.com/file/d/1Y7Q1FddKsqxdmB6q8JCpimrgIahJCzzA/view?usp=sharing)
