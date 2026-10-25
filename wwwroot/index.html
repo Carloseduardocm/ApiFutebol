@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel de Clubes - API Futebol Brasileiro</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container header-container">
+      <div>
+        <h1 class="header-title">Futebol Clube Manager</h1>
+        <p class="header-subtitle">Interface Integrada à API REST de Futebol Brasileiro</p>
+      </div>
+      <div class="api-tag" role="status" aria-label="Status de conexão com a API">
+        <span class="badge-indicator"></span>
+        <span id="tag-conexao">Conectado à API</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="container main-content">
+    <!-- Caixa de mensagens acessível para status e erros -->
+    <div id="mensagem-status" class="alert-box" role="status" aria-live="polite" hidden>
+      <span id="mensagem-texto"></span>
+      <button type="button" id="btn-fechar-mensagem" class="btn-close" aria-label="Fechar mensagem">&times;</button>
+    </div>
+
+    <div class="layout-grid">
+      <!-- Formulário de Cadastro e Edição -->
+      <section class="card form-section" aria-labelledby="form-heading">
+        <div class="card-header">
+          <h2 id="form-heading" class="card-title">Formulário de Clube</h2>
+          <span id="indicador-modo" class="badge badge-novo">Novo Cadastro</span>
+        </div>
+
+        <p class="section-desc">
+          Cadastre novos clubes ou selecione um registro da lista para editar diretamente no banco de dados da API.
+        </p>
+
+        <form id="form-clube" novalidate>
+          <input type="hidden" id="clube-id" name="id" value="">
+
+          <div class="form-group">
+            <label for="clube-nome" class="form-label">
+              Nome do Clube <span class="required" aria-hidden="true">*</span>
+            </label>
+            <input 
+              type="text" 
+              id="clube-nome" 
+              name="nome" 
+              class="form-control" 
+              placeholder="Ex.: Sociedade Esportiva Palmeiras" 
+              required 
+              autocomplete="off"
+            >
+            <small class="form-hint">Nome oficial ou usual do clube de futebol.</small>
+          </div>
+
+          <div class="form-group">
+            <label for="clube-estado" class="form-label">
+              Estado (UF) <span class="required" aria-hidden="true">*</span>
+            </label>
+            <select id="clube-estado" name="estado" class="form-control" required>
+              <option value="" disabled selected>Selecione um estado</option>
+              <option value="AC">Acre (AC)</option>
+              <option value="AL">Alagoas (AL)</option>
+              <option value="AP">Amapá (AP)</option>
+              <option value="AM">Amazonas (AM)</option>
+              <option value="BA">Bahia (BA)</option>
+              <option value="CE">Ceará (CE)</option>
+              <option value="DF">Distrito Federal (DF)</option>
+              <option value="ES">Espírito Santo (ES)</option>
+              <option value="GO">Goiás (GO)</option>
+              <option value="MA">Maranhão (MA)</option>
+              <option value="MT">Mato Grosso (MT)</option>
+              <option value="MS">Mato Grosso do Sul (MS)</option>
+              <option value="MG">Minas Gerais (MG)</option>
+              <option value="PA">Pará (PA)</option>
+              <option value="PB">Paraíba (PB)</option>
+              <option value="PR">Paraná (PR)</option>
+              <option value="PE">Pernambuco (PE)</option>
+              <option value="PI">Piauí (PI)</option>
+              <option value="RJ">Rio de Janeiro (RJ)</option>
+              <option value="RN">Rio Grande do Norte (RN)</option>
+              <option value="RS">Rio Grande do Sul (RS)</option>
+              <option value="RO">Rondônia (RO)</option>
+              <option value="RR">Roraima (RR)</option>
+              <option value="SC">Santa Catarina (SC)</option>
+              <option value="SP">São Paulo (SP)</option>
+              <option value="SE">Sergipe (SE)</option>
+              <option value="TO">Tocantins (TO)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="clube-serie-a" name="serieA" class="form-checkbox">
+              <label for="clube-serie-a" class="checkbox-label">
+                Disputa a Série A do Campeonato Brasileiro
+              </label>
+            </div>
+            <small class="form-hint">Marque se o clube estiver na primeira divisão nacional.</small>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" id="btn-submeter" class="btn btn-primary">
+              Salvar Clube
+            </button>
+            <button type="button" id="btn-cancelar" class="btn btn-secondary">
+              Limpar / Cancelar
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Listagem de Clubes Conectada à API -->
+      <section class="card list-section" aria-labelledby="list-heading">
+        <div class="card-header">
+          <div>
+            <h2 id="list-heading" class="card-title">Clubes Registrados na API</h2>
+            <p class="section-desc">Total de registros no banco: <strong id="contador-clubes">0</strong></p>
+          </div>
+          <button type="button" id="btn-recarregar" class="btn btn-outline" title="Atualiza a listagem a partir da API">
+            Atualizar Lista
+          </button>
+        </div>
+
+        <!-- Indicador visual de carregamento -->
+        <div id="estado-carregando" class="loading-state" role="status" aria-live="polite" hidden>
+          <div class="spinner" aria-hidden="true"></div>
+          <span>Carregando clubes da API...</span>
+        </div>
+
+        <!-- Mensagem de erro de carregamento com botão de retry -->
+        <div id="estado-erro" class="error-state" role="alert" hidden>
+          <p id="texto-erro">Não foi possível carregar os clubes da API.</p>
+          <button type="button" id="btn-tentar-novamente" class="btn btn-sm btn-secondary">
+            Tentar Novamente
+          </button>
+        </div>
+
+        <div class="table-responsive" tabindex="0" aria-label="Tabela de clubes de futebol cadastrados na API">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th scope="col" class="th-id">ID</th>
+                <th scope="col">Clube</th>
+                <th scope="col">Estado</th>
+                <th scope="col">Divisão</th>
+                <th scope="col" class="th-actions">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tabela-clubes-corpo">
+              <!-- Linhas inseridas dinamicamente via textContent no app.js -->
+            </tbody>
+          </table>
+        </div>
+
+        <div id="tabela-vazia" class="empty-state" hidden>
+          <p>Nenhum clube encontrado no banco de dados da API.</p>
+          <p class="empty-state-sub">Utilize o formulário ao lado para cadastrar o primeiro clube.</p>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-container">
+      <p>Interface conectada aos endpoints REST da API de Futebol (GET, POST, PUT, DELETE).</p>
+      <p class="footer-note">Os dados são persistidos no banco de dados gerenciado pelo backend.</p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

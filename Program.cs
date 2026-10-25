@@ -1,26 +1,25 @@
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddCors();
 builder.Services.AddDbContext<ApiDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 var app = builder.Build();
-
-var clubes = new List<Clube>
-{
-    new Clube(1, "Internacional", "RS", true),
-    new Clube(2, "Grêmio", "RS", true)
-};
+app.UseCors(policy => policy.AllowAnyOrigin()
+    .AllowAnyHeader().AllowAnyMethod());
+app.UseStaticFiles();
 
 app.MapGet("/", () => "API do Futebol Brasileiro está no ar!");
 
-app.MapGet("/api/clubes", () =>
+app.MapGet("/api/clubes", async (ApiDbContext db) =>
 {
+    var clubes = await db.Clubes.ToListAsync();
     return Results.Ok(clubes);
 });
 
-app.MapGet("/api/clubes/{id:int}", (int id) =>
+app.MapGet("/api/clubes/{id:int}", async (int id, ApiDbContext db) =>
 {
-    var clubeEncontrado = clubes.Find(clube => clube.id == id);
+    var clubeEncontrado = await db.Clubes.FindAsync(id);
     if (clubeEncontrado is null)
     {
         return Results.NotFound();
@@ -28,34 +27,36 @@ app.MapGet("/api/clubes/{id:int}", (int id) =>
     return Results.Ok(clubeEncontrado);
 });
 
-app.MapPost("/api/clubes", (ClubeDTO dados) =>
+app.MapPost("/api/clubes", async (ClubeEntity dados, ApiDbContext db) =>
 {
-    int proximoId = clubes.Count > 0 ? clubes.Max(c => c.id) + 1 : 1;
-    var novoClube = new Clube(proximoId, dados.nome, dados.estado, dados.serieA);
-    clubes.Add(novoClube);
-    return Results.Created($"/api/clubes/{novoClube.id}", novoClube);
+    db.Clubes.Add(dados);
+    await db.SaveChangesAsync();
+    return Results.Created($"/api/clubes/{dados.id}", dados);
 });
 
-app.MapPut("/api/clubes/{id:int}", (int id, ClubeAtualizadoDTO dados) =>
+app.MapPut("/api/clubes/{id:int}", async (int id, ClubeEntity dados, ApiDbContext db) =>
 {
-    int indice = clubes.FindIndex(clubeDaLista => clubeDaLista.id == id);
-    if (indice == -1)
+    var clubeEncontrado = await db.Clubes.FindAsync(id);
+    if (clubeEncontrado is null)
     {
         return Results.NotFound();
     }
-    var atualizado = new Clube(id, dados.nome, dados.estado, dados.serieA);
-    clubes[indice] = atualizado;
-    return Results.Ok(atualizado);
+    clubeEncontrado.nome = dados.nome;
+    clubeEncontrado.estado = dados.estado;
+    clubeEncontrado.serieA = dados.serieA;
+    await db.SaveChangesAsync();
+    return Results.Ok(clubeEncontrado);
 });
 
-app.MapDelete("/api/clubes/{id:int}", (int id) =>
+app.MapDelete("/api/clubes/{id:int}", async (int id, ApiDbContext db) =>
 {
-    int indice = clubes.FindIndex(clubeDaLista => clubeDaLista.id == id);
-    if (indice == -1)
+    var clubeEncontrado = await db.Clubes.FindAsync(id);
+    if (clubeEncontrado is null)
     {
         return Results.NotFound();
     }
-    clubes.RemoveAt(indice);
+    db.Clubes.Remove(clubeEncontrado);
+    await db.SaveChangesAsync();
     return Results.NoContent();
 });
 

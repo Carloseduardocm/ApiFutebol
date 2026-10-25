@@ -10,8 +10,8 @@ http:
     type: json
     data: |-
       {
-        "nome": "Palmeiras",
-        "estado": "SP",
+        "nome": "Inter",
+        "estado": "RS",
         "serieA": true
       }
   auth: inherit
