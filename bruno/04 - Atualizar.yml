@@ -5,13 +5,13 @@ info:
 
 http:
   method: PUT
-  url: "{{baseUrl}}/api/clubes/3"
+  url: "{{baseUrl}}/api/clubes/11"
   body:
     type: json
     data: |-
       {
-        "nome": "Sociedade Esportiva Palmeiras",
-        "estado": "SP",
+        "nome": "Sport Club Internacional",
+        "estado": "RS",
         "serieA": true
       }
   auth: inherit

@@ -10,7 +10,7 @@ http:
     type: json
     data: |-
       {
-        "nome": "Inter",
+        "nome": "Internacional",
         "estado": "RS",
         "serieA": true
       }

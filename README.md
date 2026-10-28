@@ -119,6 +119,6 @@ DELETE /api/clubes/3
 
 ## Vídeo de demonstração — AP2
 
-* [Clique aqui para assistir ao vídeo da AP2]()
+* [Clique aqui para assistir ao vídeo da AP2](https://drive.google.com/file/d/1SB6ri077hcEoqOOso3uwZXXJVajZf7pM/view?usp=drive_link)
 
 *(Vídeo anterior da AP1 mantido para histórico: [Vídeo AP1](https://drive.google.com/file/d/1Y7Q1FddKsqxdmB6q8JCpimrgIahJCzzA/view?usp=sharing))*
