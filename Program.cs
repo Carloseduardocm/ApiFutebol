@@ -1,10 +1,27 @@
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors();
 builder.Services.AddDbContext<ApiDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 var app = builder.Build();
+
+app.UseExceptionHandler(errorApp =>
+{
+    errorApp.Run(async context =>
+    {
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        context.Response.ContentType = "application/json";
+
+        await context.Response.WriteAsJsonAsync(new
+        {
+            mensagem = "Ocorreu um erro interno. Tente novamente mais tarde."
+        });
+    });
+});
+
 app.UseCors(policy => policy.AllowAnyOrigin()
     .AllowAnyHeader().AllowAnyMethod());
 app.UseStaticFiles();
