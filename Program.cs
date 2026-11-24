@@ -1,5 +1,7 @@
-using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
+using ApiFutebol.Models;
+using ApiFutebol.Data;
+using ApiFutebol.Dtos;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors();
@@ -44,20 +46,28 @@ app.MapGet("/api/clubes/{id:int}", async (int id, ApiDbContext db) =>
     return Results.Ok(clubeEncontrado);
 });
 
-app.MapPost("/api/clubes", async (ClubeEntity dados, ApiDbContext db) =>
+app.MapPost("/api/clubes", async (ClubeDTO dados, ApiDbContext db) =>
 {
-    db.Clubes.Add(dados);
+    var novoClube = new ClubeEntity
+    {
+        nome = dados.nome,
+        estado = dados.estado,
+        serieA = dados.serieA
+    };
+
+    db.Clubes.Add(novoClube);
     await db.SaveChangesAsync();
-    return Results.Created($"/api/clubes/{dados.id}", dados);
+    return Results.Created($"/api/clubes/{novoClube.id}", novoClube);
 });
 
-app.MapPut("/api/clubes/{id:int}", async (int id, ClubeEntity dados, ApiDbContext db) =>
+app.MapPut("/api/clubes/{id:int}", async (int id, ClubeAtualizadoDTO dados, ApiDbContext db) =>
 {
     var clubeEncontrado = await db.Clubes.FindAsync(id);
     if (clubeEncontrado is null)
     {
         return Results.NotFound();
     }
+
     clubeEncontrado.nome = dados.nome;
     clubeEncontrado.estado = dados.estado;
     clubeEncontrado.serieA = dados.serieA;
@@ -78,24 +88,3 @@ app.MapDelete("/api/clubes/{id:int}", async (int id, ApiDbContext db) =>
 });
 
 app.Run();
-
-class ClubeEntity
-{
-    public int id { get; set; }
-    public string nome { get; set; }
-    public string estado { get; set; }
-    public bool serieA { get; set; }
-}
-
-class ApiDbContext : DbContext
-{
-    public ApiDbContext(DbContextOptions<ApiDbContext> options) : base(options)
-    {
-    }
-
-    public DbSet<ClubeEntity> Clubes => Set<ClubeEntity>();
-}
-
-record Clube(int id, string nome, string estado, bool serieA);
-record ClubeDTO(string nome, string estado, bool serieA);
-record ClubeAtualizadoDTO(string nome, string estado, bool serieA);

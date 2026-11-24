@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using ApiFutebol.Data;
 
 #nullable disable
 
@@ -15,7 +16,7 @@ namespace ApiFutebol.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.12");
 
-            modelBuilder.Entity("ClubeEntity", b =>
+            modelBuilder.Entity("ApiFutebol.Models.ClubeEntity", b =>
                 {
                     b.Property<int>("id")
                         .ValueGeneratedOnAdd()
