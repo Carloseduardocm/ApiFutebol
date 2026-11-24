@@ -5,7 +5,7 @@ info:
 
 http:
   method: GET
-  url: "{{baseUrl}}/api/clubes/11"
+  url: "{{baseUrl}}/api/clubes/3"
   auth: inherit
 
 settings:
