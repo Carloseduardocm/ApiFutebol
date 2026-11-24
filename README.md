@@ -44,7 +44,6 @@ ApiFutebol/
 ├── Program.cs                     # Ponto de entrada: configuração de serviços, middleware de exceções e rotas da API
 ├── ApiFutebol.csproj              # Arquivo de projeto .NET 10 e dependências (EF Core / SQLite)
 ├── appsettings.json               # Configurações da aplicação e string de conexão com o banco SQLite
-├── Aula14-erros.md                # Relatório de evidências e reflexão sobre o middleware de tratamento de erros
 └── README.md                      # Documentação técnica do projeto
 ```
 
@@ -136,7 +135,7 @@ A collection completa de testes está salva na pasta **`/bruno`** deste reposit�
 
 ## Vídeo de demonstração — AS
 
-* [Clique aqui para assistir ao vídeo da AS](Link aqui)
+* [Clique aqui para assistir ao vídeo da AS](https://drive.google.com/file/d/1zditAkiTbzAG7nMetTXcAWRX_t1jOIVD/view?usp=sharing)
 
 ---
 
